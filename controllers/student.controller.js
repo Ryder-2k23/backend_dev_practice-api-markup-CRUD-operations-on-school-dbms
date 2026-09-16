@@ -57,7 +57,7 @@ const getStudent = async (req, res)=>{
     try{
         const { id } = req.params;
         const student = await Student.findById(id)
-        // whatever is isnide the findeById() depends on what u attached to req.params
+        // whatever parameter passed isnide the findeById() depends on what u attached to req.params
 
         if(!student){
             return sendError(res, 404, "Student not found")
