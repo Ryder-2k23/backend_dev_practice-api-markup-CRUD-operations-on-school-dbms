@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
+import authRoutes from "./routes/auth.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import teacherRoutes from "./routes/teacher.routes.js";
 import courseRoutes from "./routes/course.routes.js";
@@ -15,6 +16,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
 //ROUTES
+app.use("/api/auth", authRoutes);
 app.use("/api/students", studentRoutes);
 app.use(errorMiddleware);
 app.use("/api/teachers",teacherRoutes );

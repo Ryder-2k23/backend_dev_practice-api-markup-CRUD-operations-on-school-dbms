@@ -1,6 +1,6 @@
 import { mongoose } from "mongoose";
 
-const teacherSchema = new mongoose.Schema({
+const adminSchema = new mongoose.Schema({
     firstName:{
         type:String,
         required: [true, "First name is required"],
@@ -38,15 +38,15 @@ const teacherSchema = new mongoose.Schema({
 
 
     //Authentication account
-        user:{
-             type: mongoose.Schema.Types.ObjectId,
-             ref: "User",
-             default:null
-        }
+    user:{
+         type: mongoose.Schema.Types.ObjectId,
+         ref: "User",
+         default:null
+    }
 
 }, {timesatamps: true});
 
 
-const Teacher = mongoose.model("Teacher", teacherSchema);
+const Admin = mongoose.model("Admin", adminSchema);
 
-export default Teacher;
+export default Admin;

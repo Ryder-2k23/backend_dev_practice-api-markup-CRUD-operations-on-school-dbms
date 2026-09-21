@@ -40,6 +40,13 @@ address:{
 profile:{
     type: String,
     default: null
+},
+
+//Authentication account
+user:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default:null
 }
 }, {timestamps:true})
 
