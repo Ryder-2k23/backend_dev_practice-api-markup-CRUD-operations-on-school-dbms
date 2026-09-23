@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import Student from "../models/student.model.js";
 import Teacher from "../models/teacher.model.js";
+import Admin from "../models/admin.model.js";
 import { sendError, sendSUCCESS } from "../utils/response.js";
 import env from "dotenv"
 
@@ -65,7 +66,7 @@ export const registerStudent = async (req,  res)=>{
         //create auth acct.
         const user = await User.create({
             email: normalizeEmail,
-            password: harshPassword.at,
+            password: harshPassword,
             role: "student",
             student: student._id
         });
@@ -170,6 +171,78 @@ export const registerTeacher = async (req,  res)=>{
 }
 
 
+export const registerAdmin = async (req,  res)=>{
+    try {
+        const {firstName, lastName, email, password, phone,Speacialization,qualification}= req.body;
+        if(!firstName || !lastName || !email || !password){
+            return sendError(res, 400, "First name, last name, email and password are required");
+        }
+
+        //to prevent maliscious emails from attackers
+        const normalizeEmail = email.toLowerCase()
+
+
+        //check authentication acct.
+        const existingUser = await User.findOne({email:normalizeEmail});
+        if(existingUser){
+         return sendError(res, 409, "A user with this email already exists");
+        };
+
+        //check shool profile
+        const existingAdmin = await User.findOne({email:normalizeEmail});
+        if(existingAdmin){
+         return sendError(res, 409, "A teacher with this email already exists");
+        };
+
+
+        //hashing password
+        const harshPassword = await bcrypt.hash(password, 10);
+
+        //create teacher profile
+        const admin = await Admin.create({
+            firstName,
+            lastName,
+            email: normalizeEmail,
+            phone,
+           Speacialization,
+           qualification
+        });
+
+        //create auth acct.
+        const user = await User.create({
+            email: normalizeEmail,
+            password: harshPassword,
+            role: "admin",
+            student: admin._id
+        });
+
+        //connect teacher to the user
+        admin.user = user._id;
+        await admin.save();
+
+
+        const token = generateToken(user);
+        return sendSUCCESS(res,201,"Admin registration successful", {
+            user:{
+                id:user._id,
+                email: user.email,
+                role:user.role
+            },
+             admin:{
+                id:admin._id,
+               firstName:admin.firstName,
+               lastName : admin.lastName,
+               email: admin.email
+            },
+            accessToken: token
+        })
+    }  catch (error) {
+        console.error(" error: ", error);
+        return sendError(res, 500, "Failed to register teacher", error.message);
+    };
+}
+
+//login
 export const login = async (req, res)=>{
     try {
         const {email, password} = req.body;
@@ -222,4 +295,10 @@ export const login = async (req, res)=>{
         console.error("Login error: ", error);
         return sendError(res, 500, "Failed to login", error.message);
     };
+}
+
+
+//get logged in user detail
+export  const profile = async(req, res)=>{
+    return sendSUCCESS(res, 200, "Authenticated user retrieved successfully", {user:req.user})
 }

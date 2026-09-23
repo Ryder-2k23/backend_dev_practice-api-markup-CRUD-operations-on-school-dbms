@@ -1,9 +1,10 @@
 import express from "express";
 import { getStudentEnrolled,enrollStudent,courseUnderTeacher, removeStudent, createCourse, getCourses, getSingleCourse, updateCourse,deleteCourse } from "../controllers/course.controller.js";
+import { authMiddleware, roleMiddleware } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.post("/", createCourse);
+router.post("/", authMiddleware, roleMiddleware("admin"), createCourse);
 router.get("/",  getCourses);
 router.get("/:id", getSingleCourse);
 router.put("/:id", updateCourse);
